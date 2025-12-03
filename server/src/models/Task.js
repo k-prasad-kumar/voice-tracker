@@ -16,7 +16,7 @@ const TaskSchema = new mongoose.Schema({
     default: "Medium",
   },
 
-  dueDate: { type: Date },
+  dueDate: { type: Date, required: true },
 
   transcript: { type: String },
 

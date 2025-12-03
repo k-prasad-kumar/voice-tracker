@@ -1,33 +1,15 @@
+const { formError } = require("../middlewares/formValidator");
 const Task = require("../models/Task");
 const mongoose = require("mongoose");
-
-const VALID_STATUS = ["To Do", "In Progress", "Done"];
-const VALID_PRIORITY = ["Low", "Medium", "High"];
 
 exports.createTask = async (req, res) => {
   try {
     const { title, description, status, priority, dueDate, transcript } =
       req.body;
 
-    if (!title || title.trim() === "") {
-      return res.status(400).json({ error: "Title is required" });
-    }
-
-    if (status && !VALID_STATUS.includes(status)) {
-      return res.status(400).json({ error: "Invalid status value" });
-    }
-
-    if (priority && !VALID_PRIORITY.includes(priority)) {
-      return res.status(400).json({ error: "Invalid priority value" });
-    }
-
-    if (!dueDate) {
-      return res.status(400).json({ error: "Due date is required" });
-    }
-
-    if (dueDate && isNaN(Date.parse(dueDate))) {
-      return res.status(400).json({ error: "Invalid due date" });
-    }
+    const validation = formError(title, status, priority, dueDate);
+    if (!validation.success)
+      return res.status(400).json({ error: validation.error });
 
     const task = await Task.create({
       title,
@@ -73,13 +55,9 @@ exports.completeTask = async (req, res) => {
     const { title, description, status, priority, dueDate, transcript } =
       req.body;
 
-    if (status && !VALID_STATUS.includes(status)) {
-      return res.status(400).json({ error: "Invalid status value" });
-    }
-
-    if (priority && !VALID_PRIORITY.includes(priority)) {
-      return res.status(400).json({ error: "Invalid priority value" });
-    }
+    const validation = formError(title, status, priority, dueDate);
+    if (!validation.success)
+      return res.status(400).json({ error: validation.error });
 
     const updatedTask = await Task.findByIdAndUpdate(
       req.params.id,
