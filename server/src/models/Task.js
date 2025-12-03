@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const TaskSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -18,9 +18,9 @@ const TaskSchema = new mongoose.Schema({
 
   dueDate: { type: Date },
 
-  transcript: { type: String }, // from voice input
+  transcript: { type: String },
 
   createdAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.model("Task", TaskSchema);
+module.exports = mongoose.model("Task", TaskSchema);

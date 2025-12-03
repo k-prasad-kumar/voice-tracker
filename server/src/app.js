@@ -6,6 +6,9 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // for form data
+
+app.use(require("./middlewares/errorHandler"));
 
 app.use("/api/tasks", taskRoutes);
 
