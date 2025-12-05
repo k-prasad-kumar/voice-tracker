@@ -39,8 +39,9 @@ exports.getTasks = async (req, res) => {
   }
 };
 
-exports.completeTask = async (req, res) => {
+exports.updateTask = async (req, res) => {
   try {
+    console.log(req.params.id);
     // validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ error: "Invalid task ID" });
