@@ -54,24 +54,16 @@ const CreateTask = () => {
     parseTask(transcript);
   };
 
-  const {
-    transcript,
-    listening,
-    // resetTranscript,
-    browserSupportsSpeechRecognition,
-  } = useSpeechRecognition();
+  const { transcript, listening, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
 
   useEffect(() => {
     if (data) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setTitle(data.title);
-      setDescription(data.description);
-      setPriority(data.priority);
-      setStatus(data.status);
-
-      // if (data.dueDate) {
-      //   setDate(new Date(data.dueDate));
-      // }
+      setDescription(data.description ? data.description : transcript);
+      setPriority(data.priority ? data.priority : "Low");
+      setStatus(data.status ? data.status : "To Do");
 
       if (data.dueDate) {
         const parsed = parseDueDate(data.dueDate);
@@ -228,7 +220,7 @@ const CreateTask = () => {
 
             <Separator className="mt-4" />
             <div>
-              <Button className="mt-6 w-full" type="submit">
+              <Button className="mt-6 w-full cursor-pointer" type="submit">
                 Create Task
               </Button>
             </div>

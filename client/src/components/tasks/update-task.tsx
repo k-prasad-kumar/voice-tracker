@@ -245,7 +245,7 @@ const UpdateDialog = (task: TaskInterface) => {
               </div>
               <Separator className="mt-4" />
               <div>
-                <Button className="mt-6 w-full" type="submit">
+                <Button className="mt-6 w-full cursor-pointer" type="submit">
                   Update Task
                 </Button>
               </div>

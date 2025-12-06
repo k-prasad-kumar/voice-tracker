@@ -29,7 +29,7 @@ const BoardView = () => {
               3
             </p>
           </div>
-          <div className="w-full flex flex-col items-center justify-center h-full gap-4">
+          <div className="w-full flex flex-col items-center mt-8 h-full gap-4">
             {toDoTasks ? (
               toDoTasks.map((task: TaskInterface, index: number) => (
                 <TaskCard key={index} {...task} />
@@ -49,7 +49,7 @@ const BoardView = () => {
               3
             </p>
           </div>
-          <div className="w-full flex flex-col items-center justify-center h-full gap-4">
+          <div className="w-full flex flex-col items-center mt-8 h-full gap-4">
             {inProgressTasks ? (
               inProgressTasks.map((task: TaskInterface, index: number) => (
                 <TaskCard key={index} {...task} />
@@ -69,7 +69,7 @@ const BoardView = () => {
               3
             </p>
           </div>
-          <div className="w-full flex flex-col items-center justify-center h-full gap-4">
+          <div className="w-full flex flex-col items-center mt-8 h-full gap-4">
             {doneTasks ? (
               doneTasks.map((task: TaskInterface, index: number) => (
                 <TaskCard key={index} {...task} />
