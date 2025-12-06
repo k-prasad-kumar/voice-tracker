@@ -20,7 +20,7 @@ const BoardView = () => {
   if (error) return <ErrorLoading />;
 
   return (
-    <main className="w-full h-full px-14 mt-5 flex">
+    <main className="w-full h-full px-4 md:px-10 lg:px-14 mt-5 flex">
       <section className="w-full h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div className="w-full h-full ">
           <div className="border-b p-4 flex justify-between items-center">
