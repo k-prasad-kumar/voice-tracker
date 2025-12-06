@@ -1,4 +1,4 @@
-module.exports = (err, req, res, next) => {
+const errorHandler = (err, req, res, next) => {
   console.error("GLOBAL ERROR:", err);
 
   res.status(err.statusCode || 500).json({
@@ -6,3 +6,5 @@ module.exports = (err, req, res, next) => {
     error: err.message || "Server Error",
   });
 };
+
+export default errorHandler;

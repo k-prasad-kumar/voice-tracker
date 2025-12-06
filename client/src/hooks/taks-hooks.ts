@@ -49,13 +49,68 @@ export const useCreateTask = () => {
   });
 };
 
-export const useTasks = () => {
+export const useParseTask = () => {
+  return useMutation({
+    mutationFn: async (transcript: string) => {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/tasks/parse-task`,
+        { transcript }
+      );
+      return res.data;
+    },
+
+    onMutate: () => {
+      toast.loading("Parsing task...", { id: "parse-task" });
+    },
+
+    onError: (error) => {
+      toast.error(error.message, { id: "parse-task" });
+    },
+
+    onSuccess: () => {
+      toast.success("Task parsed successfully!", { id: "parse-task" });
+    },
+  });
+};
+
+export const useHomeTasks = () => {
   return useQuery({
     queryKey: ["tasks"],
     queryFn: async () => {
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tasks`);
       return res.data;
     },
+  });
+};
+
+export const useTasks = ({
+  query,
+  priority,
+  status,
+  date,
+}: {
+  query: string;
+  priority: string;
+  status: string;
+  date: Date | undefined;
+}) => {
+  return useQuery({
+    queryKey: ["tasks", query, priority, status, date], // 👈 refetches on change
+    queryFn: async () => {
+      const params = {
+        q: query,
+        priority,
+        status,
+        dueDate: date ? date.toISOString() : "",
+      };
+
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/tasks`, {
+        params,
+      });
+
+      return res.data;
+    },
+    enabled: true,
   });
 };
 

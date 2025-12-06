@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const TaskSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -16,11 +16,11 @@ const TaskSchema = new mongoose.Schema({
     default: "Medium",
   },
 
-  dueDate: { type: Date, required: true },
+  dueDate: { type: Date },
 
   transcript: { type: String },
 
   createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("Task", TaskSchema);
+export default mongoose.model("Task", TaskSchema);

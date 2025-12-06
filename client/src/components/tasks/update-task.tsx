@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PencilIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import {
   Select,
@@ -30,9 +30,13 @@ import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import FormError from "../form-error";
-import { useUpdateTask } from "@/hooks/taks-hooks";
+import { useParseTask, useUpdateTask } from "@/hooks/taks-hooks";
 import { toast } from "sonner";
 import type { TaskInterface } from "@/lib/interfaces";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
+import { parseDueDate } from "@/lib/parse-date";
 
 const UpdateDialog = (task: TaskInterface) => {
   const [open, setOpen] = useState(false);
@@ -44,7 +48,47 @@ const UpdateDialog = (task: TaskInterface) => {
   const [error, setError] = useState<string | undefined>();
   const [openDialog, setOpenDialog] = useState(false);
 
+  const { mutate: parseTask, data } = useParseTask();
   const updateTask = useUpdateTask();
+
+  // Speech recognition hooks and functions
+  const startListening = () =>
+    SpeechRecognition.startListening({ continuous: true, language: "en-IN" });
+  const stopListening = () => {
+    SpeechRecognition.stopListening();
+    parseTask(transcript);
+  };
+
+  const {
+    transcript,
+    listening,
+    // resetTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+
+  useEffect(() => {
+    if (data) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTitle(data.title);
+      setDescription(data.description);
+      setPriority(data.priority);
+      setStatus(data.status);
+
+      // if (data.dueDate) {
+      //   setDate(new Date(data.dueDate));
+      // }
+
+      if (data.dueDate) {
+        const parsed = parseDueDate(data.dueDate);
+        if (parsed) setDate(parsed);
+        else console.log("Invalid AI date:", data.dueDate);
+      }
+    }
+  }, [data]);
+
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Your browser does not support speech recognition.</span>;
+  }
 
   const handleUpdate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -86,9 +130,7 @@ const UpdateDialog = (task: TaskInterface) => {
               </DialogDescription>
             </DialogHeader>
             <div className="w-full bg-[#f4f7fa] mb-4">
-              <p className="p-4 text-sm text-slate-600">
-                Fields marked with * are mandatory.
-              </p>
+              <p className="p-4 text-sm text-slate-600">{transcript}</p>
             </div>
             <form className="w-full" onSubmit={handleUpdate}>
               <div className="grid w-full items-center gap-3">
@@ -187,16 +229,24 @@ const UpdateDialog = (task: TaskInterface) => {
               </div>
 
               <Separator className="mt-6" />
+              {/* Mic Button - Controlled by the listening state and new functions */}
               <div className="flex justify-center flex-col items-center">
-                <div className="w-18 h-18 bg-blue-600 rounded-full flex items-center justify-center cursor-pointer hover:shadow-lg hover:bg-blue-700 transition mt-6">
-                  <MicIcon color="white" />
+                <div
+                  className={`w-18 h-18 ${
+                    listening ? "bg-red-600 animate-pulse" : "bg-blue-600"
+                  } rounded-full flex items-center justify-center cursor-pointer hover:shadow-lg transition mt-6 p-4`}
+                  onClick={listening ? stopListening : startListening}
+                >
+                  <MicIcon color="white" size={30} />
                 </div>
-                <p className="text-blue-400 mt-1">Listening...</p>
+                <p className="text-blue-400 mt-1">
+                  {listening ? "Listening... Speak now!" : "Tap mic to speak"}
+                </p>
               </div>
               <Separator className="mt-4" />
               <div>
                 <Button className="mt-6 w-full" type="submit">
-                  Create Task
+                  Update Task
                 </Button>
               </div>
             </form>

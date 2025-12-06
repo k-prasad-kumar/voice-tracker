@@ -25,14 +25,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Separator } from "../ui/separator";
-import { useCreateTask } from "@/hooks/taks-hooks";
+import { useCreateTask, useParseTask } from "@/hooks/taks-hooks";
 import FormError from "../form-error";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
-import { toast } from "sonner";
+import { parseDueDate } from "@/lib/parse-date";
 
 const CreateTask = () => {
   const [open, setOpen] = useState(false);
@@ -43,6 +43,7 @@ const CreateTask = () => {
   const [status, setStatus] = useState("");
   const [error, setError] = useState<string | undefined>("");
 
+  const { mutate: parseTask, data } = useParseTask();
   const createTask = useCreateTask();
 
   // Speech recognition hooks and functions
@@ -50,7 +51,7 @@ const CreateTask = () => {
     SpeechRecognition.startListening({ continuous: true, language: "en-IN" });
   const stopListening = () => {
     SpeechRecognition.stopListening();
-    toast.success("Mic stopped--" + transcript);
+    parseTask(transcript);
   };
 
   const {
@@ -60,6 +61,26 @@ const CreateTask = () => {
     browserSupportsSpeechRecognition,
   } = useSpeechRecognition();
 
+  useEffect(() => {
+    if (data) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTitle(data.title);
+      setDescription(data.description);
+      setPriority(data.priority);
+      setStatus(data.status);
+
+      // if (data.dueDate) {
+      //   setDate(new Date(data.dueDate));
+      // }
+
+      if (data.dueDate) {
+        const parsed = parseDueDate(data.dueDate);
+        if (parsed) setDate(parsed);
+        else console.log("Invalid AI date:", data.dueDate);
+      }
+    }
+  }, [data]);
+
   if (!browserSupportsSpeechRecognition) {
     return <span>Your browser does not support speech recognition.</span>;
   }
@@ -67,7 +88,7 @@ const CreateTask = () => {
   // create task hook
   const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(title, description, priority, status, date);
+
     if (!title || !priority || !status || !date) {
       setError("Please fill in all mandatory fields.");
       return;
@@ -93,12 +114,7 @@ const CreateTask = () => {
         </CardHeader>
         <CardContent>
           <div className="w-full bg-[#f4f7fa] mb-4">
-            <p className="p-4 text-sm text-slate-600">
-              {transcript}
-              {/* {listening
-                ? transcript || "Listening..."
-                : transcript || "Say something..."} */}
-            </p>
+            <p className="p-4 text-sm text-slate-600">{transcript}</p>
           </div>
 
           <form className="w-full" onSubmit={handleCreate}>
@@ -167,7 +183,7 @@ const CreateTask = () => {
                     <Button
                       variant="outline"
                       id="date"
-                      className="w-full justify-between font-normal"
+                      className="w-full justify-between font-normal text-slate-500"
                     >
                       {date ? date.toLocaleDateString() : "Select due date"}
                       <ChevronDownIcon />

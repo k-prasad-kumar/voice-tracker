@@ -1,4 +1,4 @@
-export const formError = (title, status, priority, dueDate) => {
+const formError = (title, status, priority, dueDate) => {
   const VALID_STATUS = ["To Do", "In Progress", "Done"];
   const VALID_PRIORITY = ["Low", "Medium", "High"];
 
@@ -24,3 +24,5 @@ export const formError = (title, status, priority, dueDate) => {
 
   return { error: "Success", success: true };
 };
+
+export default formError;
